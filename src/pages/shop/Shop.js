@@ -1,43 +1,36 @@
+
 import React, { useState } from "react";
 import "./Shop.css";
 import { PRODUCTS } from "../../products.js";
 import Product from "./Product";
 
 const Shop = () => {
-  const [finalData, setFinalData] = useState(PRODUCTS);
   const [selectedProductType, setSelectedProductType] = useState("All");
   const [enteredPrice, setEnteredPrice] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(PRODUCTS);
 
   const handleCategoryClick = (productType) => {
-    console.log("Clicked productType:", productType);
     setSelectedProductType(productType);
-
-    if (productType === "All") {
-      setFinalData(PRODUCTS);
-    } else {
-      const filteredData = PRODUCTS.filter(
-        (item) => item.productType === productType
-      );
-      console.log("Filtered data:", filteredData);
-      setFinalData(filteredData);
-    }
+    filterProducts(productType, enteredPrice);
   };
 
-  const dataChange = (e) => {
+  const handlePriceChange = (e) => {
     const price = e.target.value;
     setEnteredPrice(price);
+    filterProducts(selectedProductType, price);
+  };
 
+  const filterProducts = (productType, price) => {
     const filteredData = PRODUCTS.filter((item) => {
       const isMatchedProductType =
-        selectedProductType === "All" ||
-        item.productType === selectedProductType;
+        productType === "All" || item.productType === productType;
 
       const isMatchedPrice = !price || Number(item.price) < Number(price);
 
       return isMatchedProductType && isMatchedPrice;
     });
 
-    setFinalData(filteredData);
+    setFilteredProducts(filteredData);
   };
 
   return (
@@ -45,15 +38,11 @@ const Shop = () => {
       <h1 style={{ textAlign: "center", margin: "2rem 0" }}>Products</h1>
 
       <div className="categories">
-        <button onClick={() => handleCategoryClick("All")}>All</button>
-        <button onClick={() => handleCategoryClick("mobile")}>Mobiles</button>
-        <button onClick={() => handleCategoryClick("laptop")}>Laptops</button>
-        <button onClick={() => handleCategoryClick("headphones")}>
-          Headphones
-        </button>
-        <button onClick={() => handleCategoryClick("accessories")}>
-          Accessories
-        </button>
+        {["All", "mobile", "laptop", "headphones", "accessories"].map((type) => (
+          <button key={type} onClick={() => handleCategoryClick(type)}>
+            {type}
+          </button>
+        ))}
       </div>
 
       <div>
@@ -61,12 +50,12 @@ const Shop = () => {
           type="number"
           placeholder="Search by price"
           value={enteredPrice}
-          onChange={(e) => dataChange(e)}
+          onChange={handlePriceChange}
         />
       </div>
 
       <div className="products card">
-        {finalData.map((product) => (
+        {filteredProducts.map((product) => (
           <Product key={product.id} data={product} />
         ))}
       </div>
