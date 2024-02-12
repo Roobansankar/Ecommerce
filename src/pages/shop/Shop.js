@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import "./Shop.css";
 import { PRODUCTS } from "../../products.js";
